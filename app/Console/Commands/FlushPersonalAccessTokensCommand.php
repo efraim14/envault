@@ -42,7 +42,7 @@ class FlushPersonalAccessTokensCommand extends Command
         PersonalAccessToken::whereNotNull('last_used_at')->where('last_used_at', '<=', now()->subMonths(6))->delete();
 
         //For removing never used Personal Access Tokens
-        PersonalAccessToken::whereNull('last_used_at')->where('created_at', '<=', now()->subMinutes(30))->delete();
+        PersonalAccessToken::whereNull('last_used_at')->where('created_at', '<=', now()->subMinutes(60))->delete();
 
         $this->info('Personal Access Tokens flushed successfully.');
     }
