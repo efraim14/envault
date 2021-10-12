@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Apps\Show;
 use App\Models\App;
 use App\Models\AppSetupToken;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
@@ -21,6 +22,12 @@ class SetupCommand extends Component
      * @var string
      */
     public $token = '';
+
+
+    /**
+     * @var string
+     */
+    public $authToken = '';
 
     /**
      * @var array
@@ -53,10 +60,17 @@ class SetupCommand extends Component
             return;
         }
 
-        $this->app->setup_tokens()->create([
+        $setupToken = $this->app->setup_tokens()->create([
             'token' => $this->token,
             'user_id' => auth()->user()->id,
         ]);
+
+        $createPersonalToken = [
+            'authToken' => $setupToken->user->createToken(uniqid())->plainTextToken,
+            'app' => $setupToken->app->load('variables'),
+        ];
+
+        $this->authToken = $createPersonalToken['authToken'];
 
         $this->emit('app.setup-command.generated', $this->app->id);
     }
